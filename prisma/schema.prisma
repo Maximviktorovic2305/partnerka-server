@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  name     String?
+  lastname String?
+  email    String  @unique
+  password String
+
+  isAdmin Boolean @default(false)
+}
+
+model Partner {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  name         String?
+  lastname     String?
+  email        String?    @unique
+  registerDate DateTime? @default(now())
+
+  // leads  Int?
+  status PartnerStatusEnum @default(Base)
+}
+
+enum PartnerStatusEnum {
+  Base
+  Advanced
+  Pro
+}
