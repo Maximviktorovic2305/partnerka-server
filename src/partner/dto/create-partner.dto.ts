@@ -18,6 +18,15 @@ export class CreatePartnerDto {
   registerDate: string;
 
   @IsOptional()
+  phone: string;
+
+  @IsOptional()
+  balance: number;
+
+  @IsOptional()
+  totalAwards: number;
+
+  @IsOptional()
   @IsString()
   status: PartnerStatusEnum;
 }

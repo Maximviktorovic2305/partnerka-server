@@ -3,18 +3,32 @@ import { PrismaService } from 'src/prisma.service';
 import { CreatePartnerDto } from './dto/create-partner.dto';
 import { returnPartnerObject } from './return-partner.object';
 import { UpdatePartnerDto } from './dto/update-partner.dto';
+import { formateDate } from 'src/utils/formateDate';
+import { format } from 'date-fns';
 
 @Injectable()
 export class PartnerService {
   constructor(private readonly prisma: PrismaService) {}
 
   // Создать партнера
-  async create(createPartnerDto: CreatePartnerDto) {
-    const partnerByEmail = await this.prisma.partner.findUnique({ where: { email: createPartnerDto.email } });
+  async create(dto: CreatePartnerDto) {
+    const partnerByEmail = await this.prisma.partner.findUnique({ where: { email: dto.email } });
     if (partnerByEmail) throw new BadRequestException('Партнер с таким email уже существует')
 
+    const formattedDate = format(new Date(), 'dd.MM.yyyy')
+    const formatDate = dto.registerDate ? formateDate(dto.registerDate) : formattedDate
+
     const partner = await this.prisma.partner.create({
-      data: { ...createPartnerDto },
+      data: {
+        email: dto.email,
+        name: dto.name,
+        lastname: dto.lastname,
+        phone: dto.phone,
+        balance: dto.balance,
+        totalAwards: dto.totalAwards,
+        status: dto.status,
+        registerDate: formatDate,
+      },
       select: { ...returnPartnerObject },
     });
 
@@ -33,7 +47,7 @@ export class PartnerService {
     return partner;
   }
 
-  // Получить всез партнеров
+  // Получить всех партнеров
   async getAllPartners() {
     const partners = await this.prisma.partner.findMany({
       select: { ...returnPartnerObject },
@@ -43,10 +57,21 @@ export class PartnerService {
   }
 
   // Обновить партнера
-  async updatePartner(partnerId: number, updatePartnerDto: UpdatePartnerDto) {
+  async updatePartner(dto: UpdatePartnerDto) {
+
+    const formattedDate = format(new Date(), 'dd.MM.yyyy')
+    const formatDate = dto.registerDate ? formateDate(dto.registerDate) : formattedDate
+
     const partner = await this.prisma.partner.update({
-      where: { id: partnerId },
-      data: { ...updatePartnerDto },
+      where: { id: dto.id },
+      data: { email: dto.email,
+        name: dto.name,
+        lastname: dto.lastname,
+        phone: dto.phone,
+        balance: dto.balance,
+        totalAwards: dto.totalAwards,
+        status: dto.status,
+        registerDate: formatDate, },
       select: { ...returnPartnerObject },
     });
 

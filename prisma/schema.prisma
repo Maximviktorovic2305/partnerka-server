@@ -27,8 +27,12 @@ model Partner {
 
   name         String?
   lastname     String?
-  email        String?    @unique
-  registerDate DateTime? @default(now())
+  email        String? @unique
+  registerDate String?
+
+  phone       String?
+  balance     Int?    @default(0)
+  totalAwards Int?    @default(0)
 
   // leads  Int?
   status PartnerStatusEnum @default(Base)

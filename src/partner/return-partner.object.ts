@@ -9,5 +9,7 @@ export const returnPartnerObject: Prisma.PartnerSelect = {
   email: true,
   registerDate: true,
   status: true,
+  totalAwards: true,
+  phone: true,
+  balance: true,
 };
-

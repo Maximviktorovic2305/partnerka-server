@@ -41,13 +41,12 @@ export class PartnerController {
   }
 
   // Обновить партнера
-  @Put(':id')
+  @Put()
   @Auth()
   upfdatePartner(
-    @Param('id') partnerId: number,
     @Body() updatePartnerDto: UpdatePartnerDto,
   ) {
-    return this.partnerService.updatePartner(+partnerId, updatePartnerDto);
+    return this.partnerService.updatePartner(updatePartnerDto);
   }
 
   // Удалить партнера
