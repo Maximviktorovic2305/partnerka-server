@@ -36,10 +36,44 @@ model Partner {
 
   // leads  Int?
   status PartnerStatusEnum @default(Base)
+
+  leads Lead[]
 }
 
 enum PartnerStatusEnum {
   Base
   Advanced
   Pro
+}
+
+model Lead {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  createdFormatedDate String?
+  updatedFormatedDate String?
+
+  name   String?
+  sourse LeadSourseEmum? @default(DirectAdd)
+  status LeadStatusEmum? @default(New)
+
+  offer  String?
+  amount Int?
+
+  partner   Partner? @relation(fields: [partnerId], references: [id])
+  partnerId Int?
+}
+
+enum LeadStatusEmum {
+  New
+  InWork
+  Deal
+  Cancel
+}
+
+enum LeadSourseEmum {
+  DirectAdd
+  ReferrelProgram
+  Promokod
 }

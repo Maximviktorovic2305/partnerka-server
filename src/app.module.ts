@@ -3,8 +3,9 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { PartnerModule } from './partner/partner.module';
+import { LeadModule } from './lead/lead.module';
 
 @Module({
-  imports: [UserModule, AuthModule, ConfigModule.forRoot({ isGlobal: true }), PartnerModule],
+  imports: [UserModule, AuthModule, ConfigModule.forRoot({ isGlobal: true }), PartnerModule, LeadModule],
 })
 export class AppModule {}
