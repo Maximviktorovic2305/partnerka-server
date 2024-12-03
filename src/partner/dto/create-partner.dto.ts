@@ -1,4 +1,3 @@
-import { PartnerStatusEnum } from '@prisma/client';
 import { IsOptional, IsString } from 'class-validator';
 
 export class CreatePartnerDto {
@@ -28,7 +27,7 @@ export class CreatePartnerDto {
 
   @IsOptional()
   @IsString()
-  status: PartnerStatusEnum;
+  status: string;
 }
 
 

@@ -50,10 +50,10 @@ export class LeadService {
 
     const leads = await this.prisma.lead.findMany({ where: { partnerId } });   
 
-    const newLeads = leads.filter(lead => lead.status === 'New').length
-    const inWorkLeads = leads.filter(lead => lead.status === 'InWork').length
-    const dealLeads = leads.filter(lead => lead.status === 'Deal').length
-    const cancelLeads = leads.filter(lead => lead.status === 'Cancel').length         
+    const newLeads = leads.filter(lead => lead.status === 'Новый').length
+    const inWorkLeads = leads.filter(lead => lead.status === 'В работе').length
+    const dealLeads = leads.filter(lead => lead.status === 'Сделка').length
+    const cancelLeads = leads.filter(lead => lead.status === 'Отмена').length         
 
     return {
       leads,
@@ -70,10 +70,10 @@ export class LeadService {
       select: { ...returnLeadObject },
     })         
 
-    const newLeads = leads.filter(lead => lead.status === 'New').length
-    const inWorkLeads = leads.filter(lead => lead.status === 'InWork').length
-    const dealLeads = leads.filter(lead => lead.status === 'Deal').length
-    const cancelLeads = leads.filter(lead => lead.status === 'Cancel').length
+    const newLeads = leads.filter(lead => lead.status === 'Новый').length
+    const inWorkLeads = leads.filter(lead => lead.status === 'В работе').length
+    const dealLeads = leads.filter(lead => lead.status === 'Сделка').length
+    const cancelLeads = leads.filter(lead => lead.status === 'Отмена').length  
 
     return {
       leads,

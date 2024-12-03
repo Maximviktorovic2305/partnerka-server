@@ -1,4 +1,3 @@
-import { LeadSourseEmum, LeadStatusEmum } from '@prisma/client';
 import { IsOptional, IsString } from 'class-validator';
 
 export class CreateLeadDto {
@@ -13,10 +12,10 @@ export class CreateLeadDto {
   name: string;
 
   @IsOptional()
-  sourse: LeadSourseEmum;
+  sourse: string;
 
   @IsOptional()
-  status: LeadStatusEmum;
+  status: string;
 
   @IsOptional()
   offer: string;

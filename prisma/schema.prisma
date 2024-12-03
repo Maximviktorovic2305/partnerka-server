@@ -35,15 +35,9 @@ model Partner {
   totalAwards Int?    @default(0)
 
   // leads  Int?
-  status PartnerStatusEnum @default(Base)
+  status String? @default("Базовый")
 
   leads Lead[]
-}
-
-enum PartnerStatusEnum {
-  Base
-  Advanced
-  Pro
 }
 
 model Lead {
@@ -55,25 +49,12 @@ model Lead {
   updatedFormatedDate String?
 
   name   String?
-  sourse LeadSourseEmum? @default(DirectAdd)
-  status LeadStatusEmum? @default(New)
+  sourse String? @default("Прямое добавление")
+  status String? @default("Новый")
 
   offer  String?
   amount Int?
 
   partner   Partner? @relation(fields: [partnerId], references: [id])
   partnerId Int?
-}
-
-enum LeadStatusEmum {
-  New
-  InWork
-  Deal
-  Cancel
-}
-
-enum LeadSourseEmum {
-  DirectAdd
-  ReferrelProgram
-  Promokod
-}
+}               
