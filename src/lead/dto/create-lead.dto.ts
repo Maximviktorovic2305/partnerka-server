@@ -36,3 +36,14 @@ export class GetPartnersLeadsDto {
 export class DeleteLeadDto {
   leadId: number;
 }
+
+export class GetAllLeadsDto {
+  @IsOptional()         
+  filterType: string         
+
+  @IsOptional()         
+  startDate: Date         
+
+  @IsOptional()         
+  endDate: Date
+}

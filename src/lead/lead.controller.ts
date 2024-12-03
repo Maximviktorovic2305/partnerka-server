@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, Put } from '@nestjs/common';
 import { LeadService } from './lead.service';
-import { CreateLeadDto, DeleteLeadDto, GetLeadByIdDto, GetPartnersLeadsDto } from './dto/create-lead.dto';
+import { CreateLeadDto, DeleteLeadDto, GetAllLeadsDto, GetLeadByIdDto, GetPartnersLeadsDto } from './dto/create-lead.dto';
 import { UpdateLeadDto } from './dto/update-lead.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 
@@ -30,11 +30,18 @@ export class LeadController {
     return this.leadService.getLeadsByPartnerId(+dto.partnerId);
   }
 
+//  // Получить все лиды
+//  @Get()
+//  @Auth()
+//  getAllLeads() {
+//    return this.leadService.getAllLeads();
+//  }               
+
  // Получить все лиды
- @Get()
+ @Post('allLeads')
  @Auth()
- getAllLeads() {
-   return this.leadService.getAllLeads();
+ getAllLeads(@Body() dto: GetAllLeadsDto) {
+   return this.leadService.getAllLeads(dto.filterType, dto.startDate, dto.endDate);
  }
 
  // Обновить лид
