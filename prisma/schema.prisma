@@ -37,7 +37,8 @@ model Partner {
   // leads  Int?
   status String? @default("Базовый")
 
-  leads Lead[]
+  leads        Lead[]
+  referralLink ReferralLink[]
 }
 
 model Lead {
@@ -57,4 +58,20 @@ model Lead {
 
   partner   Partner? @relation(fields: [partnerId], references: [id])
   partnerId Int?
-}               
+}
+
+model ReferralLink {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  name String?
+
+  createdFormatedDate String?
+  updatedFormatedDate String?
+
+  partner Partner? @relation(fields: [partnerId], references: [id])
+  partnerId Int?
+
+  devicesId String[]
+}
