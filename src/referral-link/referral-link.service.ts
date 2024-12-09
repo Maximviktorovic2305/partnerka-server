@@ -34,11 +34,24 @@ export class ReferralLinkService {
         createdFormatedDate: formatDateCreate,
         updatedFormatedDate: formatDateUpdate,
         partnerId: dto.partnerId,
+        name: dto.name,
       },
       select: { ...returnReferralLinkObject },
     });
 
-    return referralLink;
+    const localeLinkPath = `http://localhost:3533/?reff="${referralLink.id}"&partnerId="${referralLink.partnerId}"`;
+    const serverLinkPath = `http://85.143.216.62/:3533/?reff="${referralLink.id}"&partnerId="${referralLink.partnerId}"`;
+
+    const updatedRefferalLink = await this.prisma.referralLink.update({
+      where: { id: referralLink.id },
+      data: {
+        localeLinkPath,
+        serverLinkPath,
+      },
+      include: { partner: true },
+    });
+
+    return updatedRefferalLink;
   }
 
   // Получение ссылки по id
@@ -100,13 +113,14 @@ export class ReferralLinkService {
         updatedFormatedDate: formatDateUpdate,
         partnerId: dto.partnerId,
         name: dto.name,
-        devicesId: [...currentDevicesId, dto.devicesId], // Добавляем новое значение
+        devicesId: [...currentDevicesId, dto.devicesId !== "" ? dto.devicesId : undefined], // Добавляем новое значение         
+        registerCount: [...currentDevicesId, dto.devicesId].length,
       },
       select: { ...returnReferralLinkObject },
     });
 
     return referralLink;
-  }         
+  }
 
   // Удаление ссылки по id
   async deleteRefferalLink(id: number) {
@@ -116,7 +130,6 @@ export class ReferralLinkService {
 
     return {
       message: 'Ссылка удалена',
-    }
-
+    };
   }
 }

@@ -73,5 +73,9 @@ model ReferralLink {
   partner Partner? @relation(fields: [partnerId], references: [id])
   partnerId Int?
 
-  devicesId String[]
+  devicesId String[]   
+  registerCount Int? @default(0)
+
+  localeLinkPath String?
+  serverLinkPath String?
 }

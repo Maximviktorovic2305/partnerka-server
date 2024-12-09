@@ -5,7 +5,16 @@ export class CreateReferralLinkDto {
   partnerId: number;         
 
   @IsOptional()
-  name: string;         
+  name: string;     
+  
+  @IsOptional()
+  localeLinkPath: string
+
+  @IsOptional()
+  serverLinkPath: string
+
+  @IsOptional()
+  registerCount: number
 
   @IsOptional()
   devicesId: string;
