@@ -29,18 +29,35 @@ export class ReferralLinkService {
       ? formateDate(dto.updatedFormatedDate)
       : formattedDate;
 
+    const generateRandomString = (length) => {
+      const characters =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let randomString = '';
+
+      for (let i = 0; i < length; i++) {
+        randomString += characters.charAt(
+          Math.floor(Math.random() * characters.length),
+        );
+      }
+
+      return randomString;
+    };
+
+    const randomString = generateRandomString(16);
+
     const referralLink = await this.prisma.referralLink.create({
       data: {
         createdFormatedDate: formatDateCreate,
         updatedFormatedDate: formatDateUpdate,
         partnerId: dto.partnerId,
         name: dto.name,
+        hash: randomString,
       },
       select: { ...returnReferralLinkObject },
     });
 
-    const localeLinkPath = `http://localhost:3533/?reff="${referralLink.id}"&partnerId="${referralLink.partnerId}"`;
-    const serverLinkPath = `http://85.143.216.62/:3533/?reff="${referralLink.id}"&partnerId="${referralLink.partnerId}"`;
+    const localeLinkPath = `http://localhost:3533/?reff=${referralLink.hash}"`;
+    const serverLinkPath = `http://85.143.216.62/:3533/?reff=${referralLink.hash}`;
 
     const updatedRefferalLink = await this.prisma.referralLink.update({
       where: { id: referralLink.id },
@@ -58,6 +75,17 @@ export class ReferralLinkService {
   async getLinkById(id: number) {
     const referralLink = await this.prisma.referralLink.findUnique({
       where: { id },
+      select: { ...returnReferralLinkObject },
+    });
+    if (!referralLink) throw new NotFoundException('Нет такой ссылки');
+
+    return referralLink;
+  }   
+
+  // Получение ссылки по hash
+  async getLinkByHash(hash: string) {
+    const referralLink = await this.prisma.referralLink.findUnique({
+      where: { hash },
       select: { ...returnReferralLinkObject },
     });
     if (!referralLink) throw new NotFoundException('Нет такой ссылки');
@@ -113,14 +141,17 @@ export class ReferralLinkService {
         updatedFormatedDate: formatDateUpdate,
         partnerId: dto.partnerId,
         name: dto.name,
-        devicesId: [...currentDevicesId, dto.devicesId !== "" ? dto.devicesId : undefined], // Добавляем новое значение         
+        devicesId: [
+          ...currentDevicesId,
+          dto.devicesId !== '' ? dto.devicesId : undefined,
+        ], // Добавляем новое значение
         registerCount: [...currentDevicesId, dto.devicesId].length,
       },
       select: { ...returnReferralLinkObject },
     });
 
     return referralLink;
-  }
+  }   
 
   // Удаление ссылки по id
   async deleteRefferalLink(id: number) {

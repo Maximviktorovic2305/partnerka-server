@@ -11,6 +11,9 @@ export class CreateReferralLinkDto {
   localeLinkPath: string
 
   @IsOptional()
+  hash: string
+
+  @IsOptional()
   serverLinkPath: string
 
   @IsOptional()
@@ -39,4 +42,9 @@ export class GetPartnerRefferalLinksByPartnerIdDto {
 export class DeleteRefferalLinkDto {
   @IsOptional()
   id: number; 
+}         
+
+export class GetRefferalLinkByHash {
+  @IsOptional()
+  hash: string; 
 }

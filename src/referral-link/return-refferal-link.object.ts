@@ -9,5 +9,7 @@ export const returnReferralLinkObject: Prisma.ReferralLinkSelect = {
   devicesId: true,
   name: true,         
   registerCount: true,   
-          
+  hash: true,
+  viewCount: true,
+  viewUniqueCount: true,
 };

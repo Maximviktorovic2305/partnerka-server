@@ -15,6 +15,7 @@ import {
   CreateReferralLinkDto,
   DeleteRefferalLinkDto,
   GetPartnerRefferalLinksByPartnerIdDto,
+  GetRefferalLinkByHash,
   GetRefferalLinkByIdDto,
 } from './dto/create-referral-link.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
@@ -37,6 +38,13 @@ export class ReferralLinkController {
   @Auth()
   getLinkById(@Body() dto: GetRefferalLinkByIdDto) {
     return this.referralLinkService.getLinkById(dto.id);
+  }         
+
+  // Получение ссылки по hash
+  @Post('hash')
+  @Auth()
+  getLinkByHash(@Body() dto: GetRefferalLinkByHash) {
+    return this.referralLinkService.getLinkByHash(dto.hash);
   }
 
   // Получение всех ссылок по partnerId

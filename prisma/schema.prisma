@@ -70,11 +70,16 @@ model ReferralLink {
   createdFormatedDate String?
   updatedFormatedDate String?
 
-  partner Partner? @relation(fields: [partnerId], references: [id])
+  partner   Partner? @relation(fields: [partnerId], references: [id])
   partnerId Int?
 
-  devicesId String[]   
-  registerCount Int? @default(0)
+  hash String? @unique
+
+  viewCount       Int? @default(0)
+  viewUniqueCount Int? @default(0)
+
+  devicesId     String[]
+  registerCount Int?     @default(0)
 
   localeLinkPath String?
   serverLinkPath String?

@@ -4,7 +4,7 @@ import { CreatePartnerDto } from './dto/create-partner.dto';
 import { returnPartnerObject } from './return-partner.object';
 import { UpdatePartnerDto } from './dto/update-partner.dto';
 import { formateDate } from 'src/utils/formateDate';
-import { format } from 'date-fns';
+import { format } from 'date-fns';         
 
 @Injectable()
 export class PartnerService {
@@ -16,8 +16,8 @@ export class PartnerService {
     if (partnerByEmail) throw new BadRequestException('Партнер с таким email уже существует')
 
     const formattedDate = format(new Date(), 'dd.MM.yyyy')
-    const formatDate = dto.registerDate ? formateDate(dto.registerDate) : formattedDate
-
+    const formatDate = dto.registerDate ? formateDate(dto.registerDate) : formattedDate         
+  
     const partner = await this.prisma.partner.create({
       data: {
         email: dto.email,
