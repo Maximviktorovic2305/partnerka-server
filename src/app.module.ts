@@ -6,8 +6,9 @@ import { PartnerModule } from './partner/partner.module';
 import { LeadModule } from './lead/lead.module';
 import { ReferralLinkModule } from './referral-link/referral-link.module';
 import { ConversationModule } from './conversation/conversation.module';
+import { OffersModule } from './offers/offers.module';
 
 @Module({
-  imports: [UserModule, AuthModule, ConfigModule.forRoot({ isGlobal: true }), PartnerModule, LeadModule, ReferralLinkModule, ConversationModule],
+  imports: [UserModule, AuthModule, ConfigModule.forRoot({ isGlobal: true }), PartnerModule, LeadModule, ReferralLinkModule, ConversationModule, OffersModule],
 })
 export class AppModule {}

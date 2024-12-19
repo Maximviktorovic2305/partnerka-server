@@ -13,6 +13,8 @@ export class CreatePartnerDto {
   @IsString()
   email: string;
 
+  @IsOptional()
+  offerId: number
 
   @IsOptional()
   registerDate: string;

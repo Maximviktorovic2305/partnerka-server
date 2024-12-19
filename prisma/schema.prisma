@@ -39,6 +39,8 @@ model Partner {
 
   leads        Lead[]
   referralLink ReferralLink[]
+  offer        Offer?         @relation(fields: [offerId], references: [id])
+  offerId      Int?
 }
 
 model Lead {
@@ -78,9 +80,30 @@ model ReferralLink {
   viewCount       Int? @default(0)
   viewUniqueCount Int? @default(0)
 
-  devicesId     String[]
-  registerCount Int?     @default(0)
-
   localeLinkPath String?
   serverLinkPath String?
+  conversions    Int? @default(0)
+
+  amountToAwait Int? @default(0)
+  amountToPay   Int? @default(0)
+
+  offer   Offer? @relation(fields: [offerId], references: [id])
+  offerId Int?
+}
+
+model Offer {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  name          String?
+  domain        String? @default("http://localhost:3533")
+  conversions   Int?    @default(0)
+  amount        Int?    @default(0)
+  status        String? @default("active")
+  partnersCount Int?    @default(0)
+
+  partners Partner[]
+
+  refferalLinks ReferralLink[]
 }

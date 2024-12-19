@@ -6,7 +6,25 @@ export class CreateReferralLinkDto {
 
   @IsOptional()
   name: string;     
+
+  @IsOptional()
+  viewCount: number;  
+
+  @IsOptional()
+  viewUniqueCount: number;  
+
+  @IsOptional()
+  conversions: number
   
+  @IsOptional()
+  amountToAwait: number
+
+  @IsOptional()
+  amountToPay: number   
+  
+  @IsOptional()
+  offerId: number
+
   @IsOptional()
   localeLinkPath: string
 
@@ -15,12 +33,6 @@ export class CreateReferralLinkDto {
 
   @IsOptional()
   serverLinkPath: string
-
-  @IsOptional()
-  registerCount: number
-
-  @IsOptional()
-  devicesId: string;
 
   @IsOptional()
   createdFormatedDate: string

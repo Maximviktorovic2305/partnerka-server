@@ -29,7 +29,7 @@ export class ReferralLinkService {
       ? formateDate(dto.updatedFormatedDate)
       : formattedDate;
 
-    const generateRandomString = (length) => {
+    const generateRandomString = (length: number) => {
       const characters =
         'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
       let randomString = '';
@@ -52,11 +52,24 @@ export class ReferralLinkService {
         partnerId: dto.partnerId,
         name: dto.name,
         hash: randomString,
+        viewCount: dto.viewCount,
+        viewUniqueCount: dto.viewUniqueCount,
+        localeLinkPath: dto.localeLinkPath,
+        serverLinkPath: dto.serverLinkPath,
+        conversions: dto.conversions,
+        amountToAwait: dto.amountToAwait,
+        amountToPay: dto.amountToPay,
+        offerId: dto.offerId,
       },
       select: { ...returnReferralLinkObject },
     });
 
-    const localeLinkPath = `http://localhost:3533/?reff=${referralLink.hash}"`;
+    const offer = await this.prisma.offer.findUnique({where: {id: dto.offerId}})
+      if(!offer) {
+        throw new NotFoundException('Нет такого offer')
+      }
+
+    const localeLinkPath = `${offer.domain}/?reff=${referralLink.hash}`;
     const serverLinkPath = `http://85.143.216.62/:3533/?reff=${referralLink.hash}`;
 
     const updatedRefferalLink = await this.prisma.referralLink.update({
@@ -65,7 +78,7 @@ export class ReferralLinkService {
         localeLinkPath,
         serverLinkPath,
       },
-      include: { partner: true },
+      include: { partner: true, offer: true },
     });
 
     return updatedRefferalLink;
@@ -122,30 +135,10 @@ export class ReferralLinkService {
       ? formateDate(dto.createdFormatedDate)
       : formattedDate;
 
-    // Получаем текущий массив devicesId из базы данных
-    const currentReferralLink = await this.prisma.referralLink.findUnique({
-      where: { id: dto.id },
-      select: { devicesId: true },
-    });
-
-    const currentDevicesId = currentReferralLink?.devicesId || [];
-
-    if (currentDevicesId.includes(dto.devicesId))
-      throw new BadRequestException(
-        'Пользователь уже был зарегистирован с данного устройства',
-      );
-
     const referralLink = await this.prisma.referralLink.update({
       where: { id: dto.id },
       data: {
-        updatedFormatedDate: formatDateUpdate,
-        partnerId: dto.partnerId,
-        name: dto.name,
-        devicesId: [
-          ...currentDevicesId,
-          dto.devicesId !== '' ? dto.devicesId : undefined,
-        ], // Добавляем новое значение
-        registerCount: [...currentDevicesId, dto.devicesId].length,
+        ...dto
       },
       select: { ...returnReferralLinkObject },
     });

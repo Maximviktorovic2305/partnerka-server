@@ -12,4 +12,7 @@ export const returnPartnerObject: Prisma.PartnerSelect = {
   totalAwards: true,
   phone: true,
   balance: true,
+  referralLink: true,
+  leads: true,
+  offerId: true,         
 };
