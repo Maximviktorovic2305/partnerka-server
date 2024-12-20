@@ -69,8 +69,8 @@ export class ReferralLinkService {
         throw new NotFoundException('Нет такого offer')
       }
 
-    const localeLinkPath = `${offer.domain}/?reff=${referralLink.hash}`;
-    const serverLinkPath = `http://85.143.216.62/:3533/?reff=${referralLink.hash}`;
+    const localeLinkPath = `${offer.domain}/?add=${referralLink.hash}`;
+    const serverLinkPath = `http://85.143.216.62/:3533/?add=${referralLink.hash}`;
 
     const updatedRefferalLink = await this.prisma.referralLink.update({
       where: { id: referralLink.id },

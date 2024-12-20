@@ -11,10 +11,10 @@ export class ConversationController {
     private referralLinkService: ReferralLinkService, private prisma: PrismaService) {}
 
   @Post()
-  async receivePartnerId(@Body() body: { reff: string, unique: boolean }, @Res() res: Response): Promise<void> {
-    const { reff, unique } = body;
+  async receivePartnerId(@Body() body: { add: string, unique: boolean }, @Res() res: Response): Promise<void> {
+    const { add, unique } = body;
 
-    const reffLink = await this.referralLinkService.getLinkByHash(reff);
+    const reffLink = await this.referralLinkService.getLinkByHash(add);
     if (!reffLink) {
       res.json({ message: 'Link not found' })
       throw new BadRequestException('Referral link not found');
