@@ -13,7 +13,7 @@ export class OffersService {
     const offer = await this.prisma.offer.create({
       data: {
         name: dto.name,
-        domain: dto.domain,
+        domain: dto.domain ? dto.domain : 'http://localhost:3533',
         conversions: dto.conversions,
         amount: dto.amount,
         status: dto.status,
