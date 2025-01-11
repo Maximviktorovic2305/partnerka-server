@@ -41,6 +41,8 @@ model Partner {
   referralLink ReferralLink[]
   offer        Offer?         @relation(fields: [offerId], references: [id])
   offerId      Int?
+
+  withdraws Withdraw[]
 }
 
 model Lead {
@@ -82,7 +84,7 @@ model ReferralLink {
 
   localeLinkPath String?
   serverLinkPath String?
-  conversions    Int? @default(0)
+  conversions    Int?    @default(0)
 
   amountToAwait Int? @default(0)
   amountToPay   Int? @default(0)
@@ -106,4 +108,19 @@ model Offer {
   partners Partner[]
 
   refferalLinks ReferralLink[]
+}
+
+model Withdraw {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  createdFormatedDate String?
+
+  partner   Partner? @relation(fields: [partnerId], references: [id])
+  partnerId Int?
+
+  partnerEmail String?
+  comment      String?
+  amount       Int?
 }
