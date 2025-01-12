@@ -16,6 +16,9 @@ export class CreateWithdrawDto {
   comment: string;
 
   @IsOptional()
+  isPaydOut: boolean
+
+  @IsOptional()
   @IsNumber()
   amount: number;
 }

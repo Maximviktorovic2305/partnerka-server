@@ -117,8 +117,10 @@ model Withdraw {
 
   createdFormatedDate String?
 
-  partner   Partner? @relation(fields: [partnerId], references: [id])
-  partnerId Int?
+  partner   Partner? @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  partnerId Int?   
+
+  isPaydOut Boolean? @default(false)
 
   partnerEmail String?
   comment      String?

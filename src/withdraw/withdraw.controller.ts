@@ -51,6 +51,20 @@ export class WithdrawController {
     return this.withdrawService.getAllWithdraws();
   }
 
+   // Получить все непроведенные выплаты выплаты
+   @Get('not-payd')
+   @Auth()
+   getAllIsNotPaydOutWithdraws() {
+     return this.withdrawService.getAllIsNotPaydOutWithdraws();
+   }
+
+   // Получить все проведенные выплаты выплаты
+   @Get('payd')
+   @Auth()
+   getAllIsPaydOutWithdraws() {
+     return this.withdrawService.getAllIsPaydOutWithdraws();
+   }
+
   // Обновить выплату
   @Put()
   @Auth()

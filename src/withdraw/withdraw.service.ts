@@ -58,7 +58,27 @@ export class WithdrawService {
     });
 
     return withdraws;
-  }         
+  }      
+  
+  // Получить все непроведенные выплаты выплаты
+  async getAllIsNotPaydOutWithdraws() {
+    const withdraws = await this.prisma.withdraw.findMany({
+      where: { isPaydOut: false },
+      select: { ...returnWithdrawObject },
+    });
+
+    return withdraws;
+  }               
+
+  // Получить все проведенные выплаты выплаты
+  async getAllIsPaydOutWithdraws() {
+    const withdraws = await this.prisma.withdraw.findMany({
+      where: { isPaydOut: true },
+      select: { ...returnWithdrawObject },
+    });
+
+    return withdraws;
+  } 
 
   // Получить все выплаты партнера         
   async getAllPartnerWithdraws(partnerId: number) {
@@ -81,29 +101,32 @@ export class WithdrawService {
     const {
       createdFormatedDate,
       partnerId,
-      partnerEmail,
       id,
+      isPaydOut,
       amount,
       comment,
     } = dto;
+
+    const withdraw = await this.prisma.withdraw.findUnique({ where: { id } });
+
     const formattedDate = format(new Date(), 'dd.MM.yyyy');
     const createdDate = createdFormatedDate
       ? formateDate(createdFormatedDate)
       : formattedDate;
 
-    const withdraw = await this.prisma.withdraw.update({
+    const upfatedWithdraw = await this.prisma.withdraw.update({
       where: { id },
       data: {
-        createdFormatedDate: createdDate,
+        createdFormatedDate: createdFormatedDate === withdraw.createdFormatedDate ? withdraw.createdFormatedDate : createdDate,
         partnerId,
-        partnerEmail,
         comment,
+        isPaydOut,
         amount,
       },
       select: { ...returnWithdrawObject },
     });
 
-    return withdraw;
+    return upfatedWithdraw;
   }
 
   // Удалить выплату
