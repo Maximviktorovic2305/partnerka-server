@@ -38,7 +38,7 @@ export class WithdrawController {
   }
 
   // Получить все выплаты партнера
-  @Get('partnerId')
+  @Post('partnerId')
   @Auth()
   getAllPartnerWithdraws(@Body() dto: GetPartnerWithdrawDto) {
     return this.withdrawService.getAllPartnerWithdraws(+dto.partnerId);

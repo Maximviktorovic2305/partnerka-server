@@ -103,7 +103,7 @@ export class WithdrawService {
       throw new BadRequestException('Такого партнера не существует');
 
     const withdraws = await this.prisma.withdraw.findMany({
-      where: { partnerId },
+      where: { partnerId: partner.id },
       select: { ...returnWithdrawObject },
     })         
 
