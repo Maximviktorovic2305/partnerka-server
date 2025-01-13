@@ -10,6 +10,9 @@ export class CreatePartnerDto {
   lastname: string;
 
   @IsOptional()
+  balanceToAwait: number;
+
+  @IsOptional()
   @IsString()
   email: string;
 
@@ -32,6 +35,3 @@ export class CreatePartnerDto {
   @IsString()
   status: string;
 }
-
-
-  

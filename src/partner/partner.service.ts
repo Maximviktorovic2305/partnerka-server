@@ -25,6 +25,7 @@ export class PartnerService {
         lastname: dto.lastname,
         phone: dto.phone,
         balance: dto.balance,
+        balanceToAwait: dto.balanceToAwait,
         totalAwards: dto.totalAwards,
         status: dto.status,
         registerDate: formatDate,
@@ -62,20 +63,28 @@ export class PartnerService {
     const formattedDate = format(new Date(), 'dd.MM.yyyy')
     const formatDate = dto.registerDate ? formateDate(dto.registerDate) : formattedDate
 
-    const partner = await this.prisma.partner.update({
+    const partner = await this.getPartnerById(dto.id);
+    if (!partner) throw new BadRequestException('Партнер не найден')
+
+    const partnerBalance = partner.withdraws.filter(item => item.isPaydOut === true).reduce((acc, item) => acc + item.amount, 0)
+    const partnerBalanceToAwait = partner.withdraws.filter(item => item.isPaydOut === false).reduce((acc, item) => acc + item.amount, 0)
+    const totalBalanse = partnerBalance + partnerBalanceToAwait
+
+    const updatedPartner = await this.prisma.partner.update({
       where: { id: dto.id },
       data: { email: dto.email,
         name: dto.name,
         lastname: dto.lastname,
         phone: dto.phone,
-        balance: dto.balance,
-        totalAwards: dto.totalAwards,
+        balance: partnerBalance,
+        balanceToAwait: partnerBalanceToAwait,
+        totalAwards: totalBalanse,
         status: dto.status,
         registerDate: formatDate, },
       select: { ...returnPartnerObject },
     });
 
-    return partner;
+    return updatedPartner;
   }
 
   // Удалить партнера

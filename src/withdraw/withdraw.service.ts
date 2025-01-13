@@ -16,6 +16,9 @@ export class WithdrawService {
       dto
     const partner = await this.prisma.partner.findUnique({
       where: { id: partnerId },
+      include: {
+        withdraws: true,
+      }
     });
     if (!partner)
       throw new BadRequestException('Такого партнера не существует');
@@ -35,6 +38,17 @@ export class WithdrawService {
       },
       select: { ...returnWithdrawObject },
     });
+
+    // Обновляем выплаты для партнера         
+    const partnerBalance = partner.withdraws.filter(item => item.isPaydOut === true).reduce((acc, item) => acc + item.amount, 0)
+    const partnerBalanceToAwait = partner.withdraws.filter(item => item.isPaydOut === false).reduce((acc, item) => acc + item.amount, 0)
+    const totalBalanse = partnerBalance + partnerBalanceToAwait   
+
+    await this.prisma.partner.update({
+      where: { id: partner.id },
+      data: { balance: partnerBalance, balanceToAwait: partnerBalanceToAwait, totalAwards: totalBalanse },
+      
+    })
 
     return withdraw;
   }
@@ -114,7 +128,7 @@ export class WithdrawService {
       ? formateDate(createdFormatedDate)
       : formattedDate;
 
-    const upfatedWithdraw = await this.prisma.withdraw.update({
+    const updatedWithdraw = await this.prisma.withdraw.update({
       where: { id },
       data: {
         createdFormatedDate: createdFormatedDate === withdraw.createdFormatedDate ? withdraw.createdFormatedDate : createdDate,
@@ -126,7 +140,18 @@ export class WithdrawService {
       select: { ...returnWithdrawObject },
     });
 
-    return upfatedWithdraw;
+    const partner = await this.prisma.partner.findUnique({ where: { id: updatedWithdraw.partnerId }, include: { withdraws: true } });
+
+    const partnerBalance = partner.withdraws.filter(item => item.isPaydOut === true).reduce((acc, item) => acc + item.amount, 0)
+    const partnerBalanceToAwait = partner.withdraws.filter(item => item.isPaydOut === false).reduce((acc, item) => acc + item.amount, 0)
+    const totalBalanse = partnerBalance + partnerBalanceToAwait   
+
+    await this.prisma.partner.update({
+      where: { id: partner.id },
+      data: { balance: partnerBalance, balanceToAwait: partnerBalanceToAwait, totalAwards: totalBalanse },
+    })
+
+    return updatedWithdraw;
   }
 
   // Удалить выплату

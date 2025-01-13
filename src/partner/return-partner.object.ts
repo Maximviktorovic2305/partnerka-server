@@ -15,4 +15,6 @@ export const returnPartnerObject: Prisma.PartnerSelect = {
   referralLink: true,
   leads: true,
   offerId: true,         
+  balanceToAwait: true,
+  withdraws: true,
 };
