@@ -12,17 +12,7 @@ export class WithdrawService {
 
   // Создать выплату
   async create(dto: CreateWithdrawDto) {
-    const { createdFormatedDate, partnerId, partnerEmail, amount, comment } =
-      dto
-    const partner = await this.prisma.partner.findUnique({
-      where: { id: partnerId },
-      include: {
-        withdraws: true,
-      }
-    });
-    if (!partner)
-      throw new BadRequestException('Такого партнера не существует');
-
+    const { createdFormatedDate, partnerId, partnerEmail, amount, comment } = dto
     const formattedDate = format(new Date(), 'dd.MM.yyyy');
     const createdDate = createdFormatedDate
       ? formateDate(createdFormatedDate)
@@ -38,6 +28,15 @@ export class WithdrawService {
       },
       select: { ...returnWithdrawObject },
     });
+
+    const partner = await this.prisma.partner.findUnique({
+      where: { id: partnerId },
+      include: {
+        withdraws: true,
+      }
+    });
+    if (!partner)
+      throw new BadRequestException('Такого партнера не существует');
 
     // Обновляем выплаты для партнера         
     const partnerBalance = partner.withdraws.filter(item => item.isPaydOut === true).reduce((acc, item) => acc + item.amount, 0)
