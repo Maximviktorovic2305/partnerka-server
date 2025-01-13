@@ -29,8 +29,8 @@ export class PartnerController {
   // Получить партнера по id
   @Get(':id')
   @Auth()
-  getPartnerById(@Param('id') partnerId: number) {
-    return this.partnerService.getPartnerById(+partnerId);
+  getPartnerById(@Param('id') id: number) {
+    return this.partnerService.getPartnerById(+id);
   }
 
   // Получить всез партнеров

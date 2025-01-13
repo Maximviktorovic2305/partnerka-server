@@ -27,15 +27,8 @@ export class LeadController {
   @Post('partnerId')
   @Auth()
   getLeadsByPartnerId(@Body() dto: GetPartnersLeadsDto) {
-    return this.leadService.getLeadsByPartnerId(+dto.partnerId);
+    return this.leadService.getLeadsByPartnerId(+dto.partnerId, dto.filterType, dto.startDate, dto.endDate);
   }
-
-//  // Получить все лиды
-//  @Get()
-//  @Auth()
-//  getAllLeads() {
-//    return this.leadService.getAllLeads();
-//  }               
 
  // Получить все лиды
  @Post('allLeads')

@@ -29,10 +29,22 @@ export class CreateLeadDto {
 
 export class GetLeadByIdDto {
   leadId: number;
-}
+}               
+
 export class GetPartnersLeadsDto {
-  partnerId: number;
-}
+    @IsOptional() 
+    partnerId: number;
+
+    @IsOptional()         
+    filterType: string         
+  
+    @IsOptional()         
+    startDate: Date         
+  
+    @IsOptional()         
+    endDate: Date
+}                     
+
 export class DeleteLeadDto {
   leadId: number;
 }

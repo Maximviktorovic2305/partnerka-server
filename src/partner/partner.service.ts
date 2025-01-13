@@ -37,9 +37,9 @@ export class PartnerService {
   }
 
   // Получить партнера по id
-  async getPartnerById(partnerId: number) {
+  async getPartnerById(id: number) {
     const partner = await this.prisma.partner.findUnique({
-      where: { id: partnerId },
+      where: { id },
       select: { ...returnPartnerObject },
     });
 
