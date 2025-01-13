@@ -36,7 +36,7 @@ export class WithdrawService {
       select: { ...returnWithdrawObject },
     });
 
-    return partner;
+    return withdraw;
   }
 
   // Получить выплату по id
