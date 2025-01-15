@@ -10,37 +10,46 @@ import { format } from 'date-fns';
 import { formateDate } from 'src/utils/formateDate';
 import { PartnerService } from 'src/partner/partner.service';
 import { UpdateLeadDto } from './dto/update-lead.dto';
+import { WithdrawService } from 'src/withdraw/withdraw.service';
 
 @Injectable()
 export class LeadService {
   constructor(
     private prisma: PrismaService,
     private partnerService: PartnerService,
+    private withdrawService: WithdrawService
   ) {}
 
   // Создать лид
   async create(dto: CreateLeadDto) {
+    const { amount, createdFormatedDate, name, offer, partnerId, sourse, status, updatedFormatedDate } = dto
+
     const formattedDate = format(new Date(), 'dd.MM.yyyy');
-    const formatDateCreate = dto.createdFormatedDate
-      ? formateDate(dto.createdFormatedDate)
+    const formatDateCreate = createdFormatedDate
+      ? formateDate(createdFormatedDate)
       : formattedDate;
-    const formatDateUpdate = dto.updatedFormatedDate
-      ? formateDate(dto.updatedFormatedDate)
+    const formatDateUpdate = updatedFormatedDate
+      ? formateDate(updatedFormatedDate)
       : formattedDate;
 
-    return this.prisma.lead.create({
+    const lead = await this.prisma.lead.create({
       data: {
         createdFormatedDate: formatDateCreate,
         updatedFormatedDate: formatDateUpdate,
-        name: dto.name,
-        sourse: dto.sourse,
-        status: dto.status,
-        offer: dto.offer,
-        amount: dto.amount,
-        partnerId: dto.partnerId,
+        name,
+        sourse,
+        status,
+        offer,
+        amount,
+        partnerId,
       },
       select: { ...returnLeadObject },
-    });
+    });          
+
+    // Создаем выплату на партнера 
+    await this.withdrawService.create({ partnerId, amount, comment: 'Лид',  isPaydOut: false, leadName: lead.name, createdFormatedDate: '', partnerEmail: '' });
+
+    return lead
   }
 
   // Получить лид по id
@@ -151,7 +160,6 @@ async getLeadsByPartnerId(partnerId: number, filterType?: string, startDate?: Da
     cancelLeads,
   };
 }
-
 
   // Получить все лиды
   async getAllLeads(filterType?: string, startDate?: Date, endDate?: Date) {

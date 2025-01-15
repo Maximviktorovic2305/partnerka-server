@@ -12,7 +12,7 @@ export class WithdrawService {
 
   // Создать выплату
   async create(dto: CreateWithdrawDto) {
-    const { createdFormatedDate, partnerId, partnerEmail, amount, comment } = dto
+    const { createdFormatedDate, partnerId, partnerEmail, amount,leadName, comment } = dto
     const formattedDate = format(new Date(), 'dd.MM.yyyy');
     const createdDate = createdFormatedDate
       ? formateDate(createdFormatedDate)
@@ -25,6 +25,7 @@ export class WithdrawService {
         partnerEmail,
         comment,
         amount,
+        leadName,
       },
       select: { ...returnWithdrawObject },
     });
@@ -107,7 +108,7 @@ export class WithdrawService {
     })         
 
     return withdraws
-  }
+  }   
 
   // Обновить выплату
   async updateWithdraw(dto: UpdateWithdrawDto) {
@@ -151,6 +152,43 @@ export class WithdrawService {
     })
 
     return updatedWithdraw;
+  }         
+
+  // Обновить множество выплат, установив isPaydOut на true
+  async updateManyWithdrawsToPaydOut(dtos: UpdateWithdrawDto[]) {
+    const updatedWithdraws = [];
+
+    for (const dto of dtos) {
+      const { id } = dto;
+
+      const withdraw = await this.prisma.withdraw.findUnique({ where: { id } });
+      if (!withdraw) {
+        throw new BadRequestException(`Выплата с id ${id} не найдена`);
+      }
+
+      const updatedWithdraw = await this.prisma.withdraw.update({
+        where: { id },
+        data: {
+          isPaydOut: true,
+        },
+        select: { ...returnWithdrawObject },
+      });
+
+      const partner = await this.prisma.partner.findUnique({ where: { id: updatedWithdraw.partnerId }, include: { withdraws: true } });
+
+      const partnerBalance = partner.withdraws.filter(item => item.isPaydOut === true).reduce((acc, item) => acc + item.amount, 0);
+      const partnerBalanceToAwait = partner.withdraws.filter(item => item.isPaydOut === false).reduce((acc, item) => acc + item.amount, 0);
+      const totalBalanse = partnerBalance + partnerBalanceToAwait;
+
+      await this.prisma.partner.update({
+        where: { id: partner.id },
+        data: { balance: partnerBalance, balanceToAwait: partnerBalanceToAwait, totalAwards: totalBalanse },
+      });
+
+      updatedWithdraws.push(updatedWithdraw);
+    }
+
+    return updatedWithdraws;
   }
 
   // Удалить выплату

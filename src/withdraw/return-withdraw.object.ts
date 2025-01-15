@@ -10,5 +10,8 @@ export const returnWithdrawObject: Prisma.WithdrawSelect = {
   partnerEmail: true,
   isPaydOut: true,
   comment: true,
-  amount: true,
+  amount: true,         
+  leadId: true,         
+  lead: true,
+  leadName: true         
 };

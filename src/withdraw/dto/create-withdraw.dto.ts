@@ -16,7 +16,10 @@ export class CreateWithdrawDto {
   comment: string;
 
   @IsOptional()
-  isPaydOut: boolean
+  isPaydOut: boolean         
+
+  @IsOptional()
+  leadName: string
 
   @IsOptional()
   @IsNumber()
@@ -33,4 +36,5 @@ export class GetPartnerWithdrawDto {
 
 export class DeleteWithDrawDto {
   withdrawId: number
-}
+}   
+

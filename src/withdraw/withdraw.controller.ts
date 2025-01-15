@@ -16,7 +16,7 @@ import {
   GetByIdWithdrawDto,
   GetPartnerWithdrawDto,
 } from './dto/create-withdraw.dto';
-import { UpdateWithdrawDto } from './dto/update-withdraw.dto';
+import { UpdateManyWithdrawsDto, UpdateWithdrawDto } from './dto/update-withdraw.dto';
 
 @Controller('withdraw')
 export class WithdrawController {
@@ -70,6 +70,13 @@ export class WithdrawController {
   @Auth()
   updateWithdraw(@Body() dto: UpdateWithdrawDto) {
     return this.withdrawService.updateWithdraw(dto);
+  }
+
+  // Обновить множество выплат
+  @Put('update-many-isPaydOutTrue')
+  @Auth()
+  updateManyWithdrawsToPaydOut(@Body() dtos: UpdateManyWithdrawsDto[]) {
+    return this.withdrawService.updateManyWithdrawsToPaydOut(dtos);
   }
 
   // Удалить выплату

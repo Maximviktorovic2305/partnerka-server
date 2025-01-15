@@ -6,5 +6,6 @@ import { PrismaService } from 'src/prisma.service';
 @Module({
   controllers: [WithdrawController],
   providers: [WithdrawService, PrismaService],
+  exports: [WithdrawService]
 })
 export class WithdrawModule {}

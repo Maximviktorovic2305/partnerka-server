@@ -30,10 +30,10 @@ model Partner {
   email        String? @unique
   registerDate String?
 
-  phone       String?
-  balance     Int?    @default(0)
-  balanceToAwait Int? @default(0)
-  totalAwards Int?    @default(0)
+  phone          String?
+  balance        Int?    @default(0)
+  balanceToAwait Int?    @default(0)
+  totalAwards    Int?    @default(0)
 
   // leads  Int?
   status String? @default("Базовый")
@@ -61,8 +61,9 @@ model Lead {
   offer  String?
   amount Int?
 
-  partner   Partner? @relation(fields: [partnerId], references: [id])
+  partner   Partner?   @relation(fields: [partnerId], references: [id])
   partnerId Int?
+  withdraw  Withdraw[]
 }
 
 model ReferralLink {
@@ -119,11 +120,15 @@ model Withdraw {
   createdFormatedDate String?
 
   partner   Partner? @relation(fields: [partnerId], references: [id], onDelete: Cascade)
-  partnerId Int?   
+  partnerId Int?
 
   isPaydOut Boolean? @default(false)
 
   partnerEmail String?
-  comment      String?
-  amount       Int?
+  lead         Lead?   @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId  Int?
+  leadName String?
+
+  comment String?
+  amount  Int?
 }
