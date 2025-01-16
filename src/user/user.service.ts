@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma.service';
 import * as argon2 from 'argon2';
 import { returnUserObject } from './return-user.object';
 import { RegisterAuthDto } from 'src/auth/dto/create-auth.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -40,6 +41,7 @@ export class UserService {
     return user;
   }
 
+  // Создание пользователя
   async create(dto: RegisterAuthDto) {
     const user = await this.prisma.user.create({
       data: {
@@ -47,6 +49,25 @@ export class UserService {
         lastname: dto.lastname,
         email: dto.email,
         password: await argon2.hash(dto.password),
+      },
+      select: { ...returnUserObject },
+    });
+
+    return user;
+  }                     
+
+  // Обновление пользователя         
+  async updateUser(dto: UpdateUserDto) {
+    const { email, isAdmin, id, lastname, name, password } = dto
+
+    const user = await this.prisma.user.update({
+      where: { id }, 
+      data: {
+        email,
+        isAdmin,
+        lastname,
+        name,
+        password: await argon2.hash(password),
       },
       select: { ...returnUserObject },
     });

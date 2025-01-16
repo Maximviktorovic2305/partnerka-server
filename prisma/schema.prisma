@@ -17,7 +17,7 @@ model User {
   email    String  @unique
   password String
 
-  isAdmin Boolean @default(false)
+  isAdmin Boolean @default(false)         
 
   partners      Partner[]
   leads         Lead[]
