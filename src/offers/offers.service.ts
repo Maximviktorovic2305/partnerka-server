@@ -9,7 +9,7 @@ export class OffersService {
   constructor(private readonly prisma: PrismaService) {}
 
   // Создание offer
-  async createOffer(dto: CreateOfferDto) {
+  async createOffer(dto: CreateOfferDto, userId: number) {
     const offer = await this.prisma.offer.create({
       data: {
         name: dto.name,
@@ -17,6 +17,7 @@ export class OffersService {
         conversions: dto.conversions,
         amount: dto.amount,
         status: dto.status,
+        userId
       },
       select: { ...returnOfferObject },
     });
@@ -25,17 +26,17 @@ export class OffersService {
   }
 
   // Получение offer по id
-  async getOfferById(id: number) {
+  async getOfferById(id: number, userId: number) {
     const offer = await this.prisma.offer.findUnique({
-      where: { id },
+      where: { id, userId },
       select: { ...returnOfferObject },
     });
     if (!offer) throw new NotFoundException('Нет такого offer');
 
-    const partnersCount = await this.getAllPartnersByOfferId(offer.id);
+    const partnersCount = await this.getAllPartnersByOfferId(offer.id, userId);
 
     const updatedOffer = await this.prisma.offer.update({
-      where: { id: offer.id },
+      where: { id: offer.id, userId },
       data: {
         partnersCount: partnersCount,
       }
@@ -45,16 +46,17 @@ export class OffersService {
   }
 
   // // Получение всех offers
-  async getAllOffers() {
+  async getAllOffers(userId: number) {
     return this.prisma.offer.findMany({
+      where: { userId },
       select: { ...returnOfferObject },
     });
   }
 
   // // Получение всех партнеров по offerId
-  async getAllPartnersByOfferId(offerId: number) {
+  async getAllPartnersByOfferId(offerId: number, userId: number) {
     const offer = await this.prisma.offer.findUnique({
-      where: { id: offerId },
+      where: { id: offerId, userId },
       include: {
         refferalLinks: true,
       },
@@ -78,9 +80,9 @@ export class OffersService {
   }
 
   // // Обновление offer по id
-  async updateOffer(dto: UpdateOfferDto) {
+  async updateOffer(dto: UpdateOfferDto, userId: number) {
     const offer = await this.prisma.offer.update({
-      where: { id: dto.id },
+      where: { id: dto.id, userId },
       data: {
         ...dto,
       },
@@ -91,9 +93,9 @@ export class OffersService {
   }
 
   // // Удаление offer по id
-  async deleteOffer(id: number) {
+  async deleteOffer(id: number, userId: number) {
     await this.prisma.offer.delete({
-      where: { id },
+      where: { id, userId },
     });
 
     return {

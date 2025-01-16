@@ -3,6 +3,7 @@ import { LeadService } from './lead.service';
 import { CreateLeadDto, DeleteLeadDto, GetAllLeadsDto, GetLeadByIdDto, GetPartnersLeadsDto } from './dto/create-lead.dto';
 import { UpdateLeadDto } from './dto/update-lead.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
+import { CurrentUser } from 'src/auth/decorators/user.decorator';
 
 @Controller('leads')
 export class LeadController {
@@ -12,44 +13,45 @@ export class LeadController {
  @Post()
  @Auth()
  @UsePipes(new ValidationPipe())
- create(@Body() createLeadDto: CreateLeadDto) {
-   return this.leadService.create(createLeadDto);
+ create(@CurrentUser('id') userId: number, @Body() createLeadDto: CreateLeadDto) {
+   return this.leadService.create(userId, createLeadDto);
  }
 
  // Получить лид по id
  @Post('leadId')
  @Auth()
- getLeadById(@Body() dto: GetLeadByIdDto) {
-   return this.leadService.getLeadById(+dto.leadId);
+ getLeadById(@CurrentUser('id') userId: number, @Body() dto: GetLeadByIdDto) {
+   return this.leadService.getLeadById(userId, +dto.leadId);
  }
 
   // Получить лиды по id партнера
   @Post('partnerId')
   @Auth()
-  getLeadsByPartnerId(@Body() dto: GetPartnersLeadsDto) {
-    return this.leadService.getLeadsByPartnerId(+dto.partnerId, dto.filterType, dto.startDate, dto.endDate);
+  getLeadsByPartnerId(@CurrentUser('id') userId: number, @Body() dto: GetPartnersLeadsDto) {
+    return this.leadService.getLeadsByPartnerId(userId, +dto.partnerId, dto.filterType, dto.startDate, dto.endDate);
   }
 
  // Получить все лиды
  @Post('allLeads')
  @Auth()
- getAllLeads(@Body() dto: GetAllLeadsDto) {
-   return this.leadService.getAllLeads(dto.filterType, dto.startDate, dto.endDate);
+ getAllLeads(@CurrentUser('id') userId: number, @Body() dto: GetAllLeadsDto) {
+   return this.leadService.getAllLeads(userId, dto.filterType, dto.startDate, dto.endDate);
  }
 
  // Обновить лид
  @Put('updateLead')
  @Auth()
  updateLead(
-   @Body() updateLeadDto: UpdateLeadDto,
+   @CurrentUser('id') userId: number,
+   @Body() updateLeadDto: UpdateLeadDto
  ) {
-   return this.leadService.updateLead(updateLeadDto);
+   return this.leadService.updateLead(userId, updateLeadDto);
  }
 
  // Удалить лид
  @Delete()
  @Auth()
- deleteLead(@Body() dto: DeleteLeadDto) {
-   return this.leadService.deleteLead(+dto.leadId);
+ deleteLead(@CurrentUser('id') userId: number, @Body() dto: DeleteLeadDto) {
+   return this.leadService.deleteLead(userId, +dto.leadId);
  }
 }

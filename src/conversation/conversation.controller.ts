@@ -3,6 +3,7 @@ import { Response } from 'express';
 import { ConversationService } from './conversation.service';
 import { PrismaService } from 'src/prisma.service';
 import { ReferralLinkService } from 'src/referral-link/referral-link.service';
+import { CurrentUser } from 'src/auth/decorators/user.decorator';
 
 
 @Controller('conversation')
@@ -11,10 +12,10 @@ export class ConversationController {
     private referralLinkService: ReferralLinkService, private prisma: PrismaService) {}
 
   @Post()
-  async receivePartnerId(@Body() body: { add: string, unique: boolean }, @Res() res: Response): Promise<void> {
+  async receivePartnerId(@Body() body: { add: string, unique: boolean }, @Res() res: Response, @CurrentUser('id') userId: number): Promise<void> {
     const { add, unique } = body;
 
-    const reffLink = await this.referralLinkService.getLinkByHash(add);
+    const reffLink = await this.referralLinkService.getLinkByHash(add, userId);
     if (!reffLink) {
       res.json({ message: 'Link not found' })
       throw new BadRequestException('Referral link not found');
@@ -22,7 +23,7 @@ export class ConversationController {
 
     // Обновляем просмотры ссылки         
     const updatedLink = await this.prisma.referralLink.update({
-      where: {id: reffLink.id},  
+      where: {id: reffLink.id, userId},  
       data: {viewCount: {increment: 1}, viewUniqueCount: unique ? {increment: 1} : reffLink.viewUniqueCount }
       
     })

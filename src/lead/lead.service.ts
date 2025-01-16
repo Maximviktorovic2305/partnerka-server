@@ -21,7 +21,7 @@ export class LeadService {
   ) {}
 
   // Создать лид
-  async create(dto: CreateLeadDto) {
+  async create(userId: number, dto: CreateLeadDto) {
     const { amount, createdFormatedDate, name, offer, partnerId, sourse, status, updatedFormatedDate } = dto
 
     const formattedDate = format(new Date(), 'dd.MM.yyyy');
@@ -42,27 +42,28 @@ export class LeadService {
         offer,
         amount,
         partnerId,
+        userId
       },
       select: { ...returnLeadObject },
     });          
 
     // Создаем выплату на партнера 
-    await this.withdrawService.create({ partnerId, amount, comment: 'Лид',  isPaydOut: false, leadName: lead.name, createdFormatedDate: '', partnerEmail: '' });
+    await this.withdrawService.create({ partnerId, amount, comment: 'Лид',  isPaydOut: false, leadName: lead.name, createdFormatedDate: '', partnerEmail: '' }, userId);
 
     return lead
   }
 
   // Получить лид по id
-  async getLeadById(leadId: number) {
+  async getLeadById(userId: number, leadId: number) {
     return this.prisma.lead.findUnique({
-      where: { id: leadId },
+      where: { id: leadId, userId },
       select: { ...returnLeadObject },
     });
   }
 
   // Получить лиды по id партнера с фильтрацией
-async getLeadsByPartnerId(partnerId: number, filterType?: string, startDate?: Date, endDate?: Date) {
-  const partner = await this.partnerService.getPartnerById(partnerId);
+async getLeadsByPartnerId(userId: number, partnerId: number, filterType?: string, startDate?: Date, endDate?: Date) {
+  const partner = await this.partnerService.getPartnerById(partnerId, userId);
   if (!partner) {
     throw new NotFoundException('Партнер не найден!');
   }
@@ -143,7 +144,7 @@ async getLeadsByPartnerId(partnerId: number, filterType?: string, startDate?: Da
   }
 
   const leads = await this.prisma.lead.findMany({
-    where: { partnerId, ...dateFilter },
+    where: { partnerId, userId, ...dateFilter },
     select: { ...returnLeadObject },
   });
 
@@ -162,7 +163,7 @@ async getLeadsByPartnerId(partnerId: number, filterType?: string, startDate?: Da
 }
 
   // Получить все лиды
-  async getAllLeads(filterType?: string, startDate?: Date, endDate?: Date) {
+  async getAllLeads(userId: number, filterType?: string, startDate?: Date, endDate?: Date) {
     const today = new Date();
     let dateFilter: any;
 
@@ -239,7 +240,7 @@ async getLeadsByPartnerId(partnerId: number, filterType?: string, startDate?: Da
     } 
 
     const leads = await this.prisma.lead.findMany({
-      where: dateFilter,
+      where: {...dateFilter, userId},
       select: { ...returnLeadObject },
     });
 
@@ -258,8 +259,8 @@ async getLeadsByPartnerId(partnerId: number, filterType?: string, startDate?: Da
   }
 
   // Обновить лид
-  async updateLead(dto: UpdateLeadDto) {
-    const lead = await this.getLeadById(dto.id);
+  async updateLead(userId: number, dto: UpdateLeadDto) {
+    const lead = await this.getLeadById(dto.id, userId);
     if (!lead) {
       throw new BadRequestException('Лид не найден!');
     }
@@ -270,7 +271,7 @@ async getLeadsByPartnerId(partnerId: number, filterType?: string, startDate?: Da
       : formattedDate;
 
     return this.prisma.lead.update({
-      where: { id: dto.id },
+      where: { id: dto.id, userId },
       data: {
         updatedFormatedDate: formatDateUpdate,
         name: dto.name,
@@ -285,13 +286,13 @@ async getLeadsByPartnerId(partnerId: number, filterType?: string, startDate?: Da
   }
 
   // Удалить лид
-  async deleteLead(leadId: number) {
-    const lead = await this.getLeadById(leadId);
+  async deleteLead(userId: number, leadId: number) {
+    const lead = await this.getLeadById(leadId, userId);
     if (!lead) {
       throw new BadRequestException('Лид не найден!');
     }
 
-    await this.prisma.lead.delete({ where: { id: leadId } });
+    await this.prisma.lead.delete({ where: { id: leadId, userId } });
 
     return {
       message: 'Лид удален',

@@ -11,8 +11,8 @@ export class PartnerService {
   constructor(private readonly prisma: PrismaService) {}
 
   // Создать партнера
-  async create(dto: CreatePartnerDto) {
-    const partnerByEmail = await this.prisma.partner.findUnique({ where: { email: dto.email } });
+  async create(dto: CreatePartnerDto, userId: number) {
+    const partnerByEmail = await this.prisma.partner.findUnique({ where: { email: dto.email, userId } });
     if (partnerByEmail) throw new BadRequestException('Партнер с таким email уже существует')
 
     const formattedDate = format(new Date(), 'dd.MM.yyyy')
@@ -28,7 +28,8 @@ export class PartnerService {
         balanceToAwait: dto.balanceToAwait,
         totalAwards: dto.totalAwards,
         status: dto.status,
-        registerDate: formatDate,
+        registerDate: formatDate,         
+        userId
       },
       select: { ...returnPartnerObject },
     });
@@ -37,9 +38,9 @@ export class PartnerService {
   }
 
   // Получить партнера по id
-  async getPartnerById(id: number) {
+  async getPartnerById(id: number, userId: number) {
     const partner = await this.prisma.partner.findUnique({
-      where: { id },
+      where: { id, userId },
       select: { ...returnPartnerObject },
     });
 
@@ -49,8 +50,9 @@ export class PartnerService {
   }
 
   // Получить всех партнеров
-  async getAllPartners() {
+  async getAllPartners(userId: number) {
     const partners = await this.prisma.partner.findMany({
+      where: { userId },
       select: { ...returnPartnerObject },
     });
 
@@ -58,12 +60,12 @@ export class PartnerService {
   }
 
   // Обновить партнера
-  async updatePartner(dto: UpdatePartnerDto) {
+  async updatePartner(dto: UpdatePartnerDto, userId: number) {
 
     const formattedDate = format(new Date(), 'dd.MM.yyyy')
     const formatDate = dto.registerDate ? formateDate(dto.registerDate) : formattedDate
 
-    const partner = await this.getPartnerById(dto.id);
+    const partner = await this.getPartnerById(dto.id, userId);
     if (!partner) throw new BadRequestException('Партнер не найден')
 
     const partnerBalance = partner.withdraws.filter(item => item.isPaydOut === true).reduce((acc, item) => acc + item.amount, 0)
@@ -71,7 +73,7 @@ export class PartnerService {
     const totalBalanse = partnerBalance + partnerBalanceToAwait
 
     const updatedPartner = await this.prisma.partner.update({
-      where: { id: dto.id },
+      where: { id: dto.id, userId },
       data: { email: dto.email,
         name: dto.name,
         lastname: dto.lastname,
@@ -88,9 +90,9 @@ export class PartnerService {
   }
 
   // Удалить партнера
-  async deletePartner(partnerId: number) {
+  async deletePartner(partnerId: number, userId: number) {
     await this.prisma.partner.delete({
-      where: { id: partnerId },
+      where: { id: partnerId, userId },
     });
 
     return { message: 'Партнер удален' };

@@ -13,6 +13,7 @@ import { PartnerService } from './partner.service';
 import { CreatePartnerDto } from './dto/create-partner.dto';
 import { UpdatePartnerDto } from './dto/update-partner.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
+import { CurrentUser } from 'src/auth/decorators/user.decorator';
 
 @Controller('partners')
 export class PartnerController {
@@ -22,22 +23,22 @@ export class PartnerController {
   @Post()
   @Auth()
   @UsePipes(new ValidationPipe())
-  create(@Body() createPartnerDto: CreatePartnerDto) {
-    return this.partnerService.create(createPartnerDto);
+  create(@Body() createPartnerDto: CreatePartnerDto, @CurrentUser('id') userId: number) {
+    return this.partnerService.create(createPartnerDto, userId);
   }
 
   // Получить партнера по id
   @Get(':id')
   @Auth()
-  getPartnerById(@Param('id') id: number) {
-    return this.partnerService.getPartnerById(+id);
+  getPartnerById(@Param('id') id: number, @CurrentUser('id') userId: number) {
+    return this.partnerService.getPartnerById(+id, userId);
   }
 
-  // Получить всез партнеров
+  // Получить всех партнеров
   @Get()
   @Auth()
-  getAllPartners() {
-    return this.partnerService.getAllPartners();
+  getAllPartners(@CurrentUser('id') userId: number) {
+    return this.partnerService.getAllPartners(userId);
   }
 
   // Обновить партнера
@@ -45,14 +46,15 @@ export class PartnerController {
   @Auth()
   upfdatePartner(
     @Body() updatePartnerDto: UpdatePartnerDto,
+    @CurrentUser('id') userId: number
   ) {
-    return this.partnerService.updatePartner(updatePartnerDto);
+    return this.partnerService.updatePartner(updatePartnerDto, userId);
   }
 
   // Удалить партнера
   @Delete(':id')
   @Auth()
-  deletePartner(@Param('id') partnerId: number) {
-    return this.partnerService.deletePartner(+partnerId);
+  deletePartner(@Param('id') partnerId: number, @CurrentUser('id') userId: number) {
+    return this.partnerService.deletePartner(+partnerId, userId);
   }
 }

@@ -11,7 +11,7 @@ export class WithdrawService {
   constructor(private prisma: PrismaService) {}
 
   // Создать выплату
-  async create(dto: CreateWithdrawDto) {
+  async create(dto: CreateWithdrawDto, userId: number) {
     const { createdFormatedDate, partnerId, partnerEmail, amount,leadName, comment } = dto
     const formattedDate = format(new Date(), 'dd.MM.yyyy');
     const createdDate = createdFormatedDate
@@ -25,13 +25,14 @@ export class WithdrawService {
         partnerEmail,
         comment,
         amount,
-        leadName,
+        leadName,                     
+        userId
       },
       select: { ...returnWithdrawObject },
     });
 
     const partner = await this.prisma.partner.findUnique({
-      where: { id: partnerId },
+      where: { id: partnerId, userId },
       include: {
         withdraws: true,
       }
@@ -45,7 +46,7 @@ export class WithdrawService {
     const totalBalanse = partnerBalance + partnerBalanceToAwait   
 
     await this.prisma.partner.update({
-      where: { id: partner.id },
+      where: { id: partner.id, userId },
       data: { balance: partnerBalance, balanceToAwait: partnerBalanceToAwait, totalAwards: totalBalanse },
       
     })
@@ -54,9 +55,9 @@ export class WithdrawService {
   }
 
   // Получить выплату по id
-  async getWithdrawById(withdrawId: number) {
+  async getWithdrawById(withdrawId: number, userId: number) {
     const withdraw = await this.prisma.withdraw.findUnique({
-      where: { id: withdrawId },
+      where: { id: withdrawId, userId },
       select: { ...returnWithdrawObject },
     });
 
@@ -66,8 +67,9 @@ export class WithdrawService {
   }
 
   // Получить все выплаты
-  async getAllWithdraws() {
+  async getAllWithdraws(userId: number) {
     const withdraws = await this.prisma.withdraw.findMany({
+      where: { userId },
       select: { ...returnWithdrawObject },
     });
 
@@ -75,9 +77,9 @@ export class WithdrawService {
   }      
   
   // Получить все непроведенные выплаты выплаты
-  async getAllIsNotPaydOutWithdraws() {
+  async getAllIsNotPaydOutWithdraws(userId: number) {
     const withdraws = await this.prisma.withdraw.findMany({
-      where: { isPaydOut: false },
+      where: { isPaydOut: false, userId },
       select: { ...returnWithdrawObject },
     });
 
@@ -85,9 +87,9 @@ export class WithdrawService {
   }               
 
   // Получить все проведенные выплаты выплаты
-  async getAllIsPaydOutWithdraws() {
+  async getAllIsPaydOutWithdraws(userId: number) {
     const withdraws = await this.prisma.withdraw.findMany({
-      where: { isPaydOut: true },
+      where: { isPaydOut: true, userId },
       select: { ...returnWithdrawObject },
     });
 
@@ -95,9 +97,9 @@ export class WithdrawService {
   } 
 
   // Получить все выплаты партнера         
-  async getAllPartnerWithdraws(partnerId: number) {
+  async getAllPartnerWithdraws(partnerId: number, userId: number) {
     const partner = await this.prisma.partner.findUnique({
-      where: { id: partnerId },
+      where: { id: partnerId, userId },
     });
     if (!partner)
       throw new BadRequestException('Такого партнера не существует');
@@ -111,7 +113,7 @@ export class WithdrawService {
   }   
 
   // Обновить выплату
-  async updateWithdraw(dto: UpdateWithdrawDto) {
+  async updateWithdraw(dto: UpdateWithdrawDto, userId: number) {
     const {
       createdFormatedDate,
       partnerId,
@@ -121,7 +123,7 @@ export class WithdrawService {
       comment,
     } = dto;
 
-    const withdraw = await this.prisma.withdraw.findUnique({ where: { id } });
+    const withdraw = await this.prisma.withdraw.findUnique({ where: { id, userId } });
 
     const formattedDate = format(new Date(), 'dd.MM.yyyy');
     const createdDate = createdFormatedDate
@@ -129,7 +131,7 @@ export class WithdrawService {
       : formattedDate;
 
     const updatedWithdraw = await this.prisma.withdraw.update({
-      where: { id },
+      where: { id, userId },
       data: {
         createdFormatedDate: createdFormatedDate === withdraw.createdFormatedDate ? withdraw.createdFormatedDate : createdDate,
         partnerId,
@@ -140,14 +142,14 @@ export class WithdrawService {
       select: { ...returnWithdrawObject },
     });
 
-    const partner = await this.prisma.partner.findUnique({ where: { id: updatedWithdraw.partnerId }, include: { withdraws: true } });
+    const partner = await this.prisma.partner.findUnique({ where: { id: updatedWithdraw.partnerId, userId }, include: { withdraws: true } });
 
     const partnerBalance = partner.withdraws.filter(item => item.isPaydOut === true).reduce((acc, item) => acc + item.amount, 0)
     const partnerBalanceToAwait = partner.withdraws.filter(item => item.isPaydOut === false).reduce((acc, item) => acc + item.amount, 0)
     const totalBalanse = partnerBalance + partnerBalanceToAwait   
 
     await this.prisma.partner.update({
-      where: { id: partner.id },
+      where: { id: partner.id, userId },
       data: { balance: partnerBalance, balanceToAwait: partnerBalanceToAwait, totalAwards: totalBalanse },
     })
 
@@ -155,33 +157,33 @@ export class WithdrawService {
   }         
 
   // Обновить множество выплат, установив isPaydOut на true
-  async updateManyWithdrawsToPaydOut(dtos: UpdateWithdrawDto[]) {
+  async updateManyWithdrawsToPaydOut(dtos: UpdateWithdrawDto[], userId: number) {
     const updatedWithdraws = [];
 
     for (const dto of dtos) {
       const { id } = dto;
 
-      const withdraw = await this.prisma.withdraw.findUnique({ where: { id } });
+      const withdraw = await this.prisma.withdraw.findUnique({ where: { id, userId } });
       if (!withdraw) {
         throw new BadRequestException(`Выплата с id ${id} не найдена`);
       }
 
       const updatedWithdraw = await this.prisma.withdraw.update({
-        where: { id },
+        where: { id, userId },
         data: {
           isPaydOut: true,
         },
         select: { ...returnWithdrawObject },
       });
 
-      const partner = await this.prisma.partner.findUnique({ where: { id: updatedWithdraw.partnerId }, include: { withdraws: true } });
+      const partner = await this.prisma.partner.findUnique({ where: { id: updatedWithdraw.partnerId, userId }, include: { withdraws: true } });
 
       const partnerBalance = partner.withdraws.filter(item => item.isPaydOut === true).reduce((acc, item) => acc + item.amount, 0);
       const partnerBalanceToAwait = partner.withdraws.filter(item => item.isPaydOut === false).reduce((acc, item) => acc + item.amount, 0);
       const totalBalanse = partnerBalance + partnerBalanceToAwait;
 
       await this.prisma.partner.update({
-        where: { id: partner.id },
+        where: { id: partner.id, userId },
         data: { balance: partnerBalance, balanceToAwait: partnerBalanceToAwait, totalAwards: totalBalanse },
       });
 
@@ -192,9 +194,9 @@ export class WithdrawService {
   }
 
   // Удалить выплату
-  async deleteWithdraw(withdrawId: number) {
+  async deleteWithdraw(withdrawId: number, userId: number) {
     await this.prisma.withdraw.delete({
-      where: { id: withdrawId },
+      where: { id: withdrawId, userId },
     });
 
     return { message: 'Выплата удалена' };

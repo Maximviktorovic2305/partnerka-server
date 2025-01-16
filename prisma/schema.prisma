@@ -18,6 +18,12 @@ model User {
   password String
 
   isAdmin Boolean @default(false)
+
+  partners      Partner[]
+  leads         Lead[]
+  referralLinks ReferralLink[]
+  offers        Offer[]
+  withdraws     Withdraw[]
 }
 
 model Partner {
@@ -35,15 +41,17 @@ model Partner {
   balanceToAwait Int?    @default(0)
   totalAwards    Int?    @default(0)
 
-  // leads  Int?
   status String? @default("Базовый")
 
   leads        Lead[]
   referralLink ReferralLink[]
-  offer        Offer?         @relation(fields: [offerId], references: [id])
+  offer        Offer?         @relation(fields: [offerId], references: [id], onDelete: Cascade)
   offerId      Int?
 
   withdraws Withdraw[]
+
+  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int?
 }
 
 model Lead {
@@ -61,9 +69,12 @@ model Lead {
   offer  String?
   amount Int?
 
-  partner   Partner?   @relation(fields: [partnerId], references: [id])
+  partner   Partner?   @relation(fields: [partnerId], references: [id], onDelete: Cascade)
   partnerId Int?
   withdraw  Withdraw[]
+
+  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int?
 }
 
 model ReferralLink {
@@ -76,7 +87,7 @@ model ReferralLink {
   createdFormatedDate String?
   updatedFormatedDate String?
 
-  partner   Partner? @relation(fields: [partnerId], references: [id])
+  partner   Partner? @relation(fields: [partnerId], references: [id], onDelete: Cascade)
   partnerId Int?
 
   hash String? @unique
@@ -91,8 +102,11 @@ model ReferralLink {
   amountToAwait Int? @default(0)
   amountToPay   Int? @default(0)
 
-  offer   Offer? @relation(fields: [offerId], references: [id])
+  offer   Offer? @relation(fields: [offerId], references: [id], onDelete: Cascade)
   offerId Int?
+
+  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int?
 }
 
 model Offer {
@@ -107,9 +121,11 @@ model Offer {
   status        String? @default("active")
   partnersCount Int?    @default(0)
 
-  partners Partner[]
-
+  partners      Partner[]
   refferalLinks ReferralLink[]
+
+  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int?
 }
 
 model Withdraw {
@@ -126,9 +142,12 @@ model Withdraw {
 
   partnerEmail String?
   lead         Lead?   @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  leadId  Int?
-  leadName String?
+  leadId       Int?
+  leadName     String?
 
   comment String?
-  amount  Int?
+  amount  Int?                     
+
+  user    User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  Int?
 }
