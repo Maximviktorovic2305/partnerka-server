@@ -57,17 +57,17 @@ export class UserService {
   }                     
 
   // Обновление пользователя         
-  async updateUser(dto: UpdateUserDto) {
-    const { email, isAdmin, id, lastname, name, password } = dto
+  async updateUser(userId: number, dto: UpdateUserDto) {
+    const { email, isAdmin, lastname, name, password } = dto
 
     const user = await this.prisma.user.update({
-      where: { id }, 
+      where: { id: userId }, 
       data: {
         email,
         isAdmin,
         lastname,
         name,
-        password: await argon2.hash(password),
+        password: password && await argon2.hash(password),
       },
       select: { ...returnUserObject },
     });

@@ -1,10 +1,6 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateUserDto {
-  @IsNumber()
-  @IsOptional()
-  id: number;         
-
   @IsString()
   @IsOptional()
   name: string;
@@ -21,7 +17,7 @@ export class UpdateUserDto {
   @IsOptional()
   password: string;
 
-  @IsString()
+  @IsBoolean()
   @IsOptional()
   isAdmin: boolean;
 }
