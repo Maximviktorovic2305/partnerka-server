@@ -10,7 +10,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { PartnerService } from './partner.service';
-import { CreatePartnerDto } from './dto/create-partner.dto';
+import { CreatePartnerDto, GetPartnerByEmailDto } from './dto/create-partner.dto';
 import { UpdatePartnerDto } from './dto/update-partner.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { CurrentUser } from 'src/auth/decorators/user.decorator';
@@ -32,6 +32,14 @@ export class PartnerController {
   @Auth()
   getPartnerById(@Param('id') id: number, @CurrentUser('id') userId: number) {
     return this.partnerService.getPartnerById(+id, userId);
+  }         
+
+  // Получить партнера по email
+  @Post('email')
+  @UsePipes(new ValidationPipe())
+  @Auth()
+  getPartnerByEmail(@Body() dto: GetPartnerByEmailDto, @CurrentUser('id') userId: number) {
+    return this.partnerService.getPartnerByEmail(dto.email, userId);
   }
 
   // Получить всех партнеров

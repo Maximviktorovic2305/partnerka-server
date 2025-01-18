@@ -47,6 +47,18 @@ export class PartnerService {
     if (!partner) throw new BadRequestException('Партнер не найден')
 
     return partner;
+  }                
+
+  // Получить партнера по email
+  async getPartnerByEmail(email: string, userId: number) {
+    const partner = await this.prisma.partner.findUnique({
+      where: { email, userId },
+      select: { ...returnPartnerObject },
+    });
+
+    if (!partner) throw new BadRequestException('Партнер не найден')
+
+    return partner;
   }
 
   // Получить всех партнеров

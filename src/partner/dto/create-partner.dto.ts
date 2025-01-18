@@ -35,3 +35,8 @@ export class CreatePartnerDto {
   @IsString()
   status: string;
 }
+
+export class GetPartnerByEmailDto {
+  @IsString()
+  email: string;
+}
