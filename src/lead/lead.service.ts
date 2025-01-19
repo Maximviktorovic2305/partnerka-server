@@ -54,9 +54,9 @@ export class LeadService {
   }
 
   // Получить лид по id
-  async getLeadById(userId: number, leadId: number) {
+  async getLeadById(userId: number, id: number) {
     return this.prisma.lead.findUnique({
-      where: { id: leadId, userId },
+      where: { id, userId },
       select: { ...returnLeadObject },
     });
   }
