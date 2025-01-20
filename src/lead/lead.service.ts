@@ -259,8 +259,8 @@ async getLeadsByPartnerId(userId: number, partnerId: number, filterType?: string
   }
 
   // Обновить лид
-  async updateLead(userId: number, dto: UpdateLeadDto) {
-    const lead = await this.getLeadById(dto.id, userId);
+  async updateLead(dto: UpdateLeadDto, userId: number) {
+    const lead = await this.getLeadById(userId, dto.id);
     if (!lead) {
       throw new BadRequestException('Лид не найден!');
     }

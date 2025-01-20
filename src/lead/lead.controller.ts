@@ -42,10 +42,10 @@ export class LeadController {
  @Put('updateLead')
  @Auth()
  updateLead(
-   @CurrentUser('id') userId: number,
-   @Body() updateLeadDto: UpdateLeadDto
+   @Body() updateLeadDto: UpdateLeadDto,
+   @CurrentUser('id') userId: number
  ) {
-   return this.leadService.updateLead(userId, updateLeadDto);
+   return this.leadService.updateLead(updateLeadDto, userId,);
  }
 
  // Удалить лид
