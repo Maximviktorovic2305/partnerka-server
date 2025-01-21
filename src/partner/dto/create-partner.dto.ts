@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreatePartnerDto {
   @IsOptional()
@@ -39,4 +39,7 @@ export class CreatePartnerDto {
 export class GetPartnerByEmailDto {
   @IsString()
   email: string;
+
+  @IsNumber()
+  adminId: number;
 }

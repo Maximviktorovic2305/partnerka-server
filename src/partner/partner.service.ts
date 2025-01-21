@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreatePartnerDto } from './dto/create-partner.dto';
+import { CreatePartnerDto, GetPartnerByEmailDto } from './dto/create-partner.dto';
 import { returnPartnerObject } from './return-partner.object';
 import { UpdatePartnerDto } from './dto/update-partner.dto';
 import { formateDate } from 'src/utils/formateDate';
@@ -40,7 +40,7 @@ export class PartnerService {
   // Получить партнера по id
   async getPartnerById(id: number, userId: number) {
     const partner = await this.prisma.partner.findUnique({
-      where: { id, userId },
+      where: { id: id, userId },
       select: { ...returnPartnerObject },
     });
 
@@ -53,6 +53,18 @@ export class PartnerService {
   async getPartnerByEmail(email: string, userId: number) {
     const partner = await this.prisma.partner.findUnique({
       where: { email, userId },
+      select: { ...returnPartnerObject },
+    });
+
+    if (!partner) throw new BadRequestException('Партнер не найден')
+
+    return partner;
+  }         
+
+  // Получить партнера по email by admin           
+  async getPartnerByEmailMyAdmin(dto: GetPartnerByEmailDto) {
+    const partner = await this.prisma.partner.findUnique({
+      where: { email: dto.email, userId: dto.adminId },
       select: { ...returnPartnerObject },
     });
 

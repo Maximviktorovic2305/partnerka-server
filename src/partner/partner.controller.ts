@@ -40,6 +40,14 @@ export class PartnerController {
   @Auth()
   getPartnerByEmail(@Body() dto: GetPartnerByEmailDto, @CurrentUser('id') userId: number) {
     return this.partnerService.getPartnerByEmail(dto.email, userId);
+  }                   
+
+  // Получить партнера по emailMyAdmin
+  @Post('emailMyAdmin')
+  @UsePipes(new ValidationPipe())
+  @Auth()
+  getPartnerByEmailMyAdmin(@Body() dto: GetPartnerByEmailDto) {
+    return this.partnerService.getPartnerByEmailMyAdmin(dto);
   }
 
   // Получить всех партнеров

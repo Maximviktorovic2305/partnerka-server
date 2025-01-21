@@ -287,7 +287,7 @@ async getLeadsByPartnerId(userId: number, partnerId: number, filterType?: string
 
   // Удалить лид
   async deleteLead(userId: number, leadId: number) {
-    const lead = await this.getLeadById(leadId, userId);
+    const lead = await this.getLeadById( userId, leadId);
     if (!lead) {
       throw new BadRequestException('Лид не найден!');
     }

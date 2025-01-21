@@ -4,6 +4,7 @@ import { ConversationService } from './conversation.service';
 import { PrismaService } from 'src/prisma.service';
 import { ReferralLinkService } from 'src/referral-link/referral-link.service';
 import { CurrentUser } from 'src/auth/decorators/user.decorator';
+import { Auth } from 'src/auth/decorators/auth.decorator';
 
 
 @Controller('conversation')
@@ -12,7 +13,8 @@ export class ConversationController {
     private referralLinkService: ReferralLinkService, private prisma: PrismaService) {}
 
   @Post()
-  async receivePartnerId(@Body() body: { add: string, unique: boolean }, @Res() res: Response, @CurrentUser('id') userId: number): Promise<void> {
+  @Auth()
+  async receivePartnerId(@Body() body: { add: string, unique: boolean }, @Res() res: Response, @CurrentUser('id') userId: number) {
     const { add, unique } = body;
 
     const reffLink = await this.referralLinkService.getLinkByHash(add, userId);
